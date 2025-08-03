@@ -1,37 +1,47 @@
+# services/user_services/app/database.py
+
 import os
 from dotenv import load_dotenv
-from sqlmodel import SQLModel, create_engine, Session
-from sqlalchemy.exc import SQLAlchemyError
+from typing import AsyncGenerator
+from sqlmodel import SQLModel
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 
-# 1. loading doenv
+# 1. Load the DATABASE_URL from your .env file
 load_dotenv()
-
-# 2. fetching db_url from .env. If not find any url, railse an error
 DATABASE_URL = os.getenv("DATABASE_URL")
 if not DATABASE_URL:
-    raise ValueError("DATABASE_URL environment variable not set")
-
-# 3. create asynchronous engine
-engine = create_engine(DATABASE_URL, echo=True)
+    raise ValueError("❌ FATAL: DATABASE_URL environment variable not set in .env file")
 
 
-# 5. logic for db & table creation
-def create_db_and_tables():
-    SQLModel.metadata.create_all(engine)
+# 2. Create the Asynchronous Engine
+# THIS IS THE CRITICAL FIX: The 'connect_args' dictionary tells the asyncpg driver
+# to disable the prepared statement cache, which is required to work with
+# Supabase's pgbouncer connection pooler.
+engine = create_async_engine(
+    DATABASE_URL,
+    echo=True,
+    connect_args={"statement_cache_size": 0}
+)
 
 
-# 6. initializing database
-def init_db():
-    print("♻️ Attepmting to initialize database....")
+# 3. Create the Async Session Maker
+async_session_maker = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
+
+
+# 4. Database Initialization and Session Logic
+async def create_db_and_tables():
+    async with engine.begin() as conn:
+        await conn.run_sync(SQLModel.metadata.create_all)
+
+async def init_db():
+    print("♻️ Attempting to initialize database....")
     try:
-        create_db_and_tables()
+        await create_db_and_tables()
         print("✅ Database and tables checked/created successfully")
-    except SQLAlchemyError as e:
-        print(f"❌ An error occurred during async database initialization: {e}")
+    except Exception as e:
+        print(f"❌ An error occurred during database initialization: {e}")
         raise
 
-
-# 7. returning session objects to make changes in database
-def get_session():
-    with Session(engine) as session:
+async def get_session() -> AsyncGenerator[AsyncSession, None]:
+    async with async_session_maker() as session:
         yield session

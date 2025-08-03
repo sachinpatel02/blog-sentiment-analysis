@@ -2,13 +2,13 @@ from fastapi import FastAPI
 from .database import init_db
 from contextlib import asynccontextmanager
 import sys
-
+from .routers import user_routes
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     print("--- Lifespan event: Application startup ---")
     try:
-        init_db()
+        await init_db()
         yield
     except Exception as e:
         print(f"FATAL ERROR: Application startup failed: {e}")
@@ -18,8 +18,4 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
-
-
-@app.get("/")
-async def root():
-    return {"message": "Hello World"}
+app.include_router(user_routes.router)
