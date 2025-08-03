@@ -4,3 +4,6 @@ sqlmodel
 asyncpg
 greenlet
 python-dotenv
+passlib
+bcrypt
+python-jose
