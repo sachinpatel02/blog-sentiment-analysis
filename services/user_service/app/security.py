@@ -1,5 +1,3 @@
-from passlib.context import CryptContext
-
 import os
 from datetime import datetime, timedelta, timezone
 from dotenv import load_dotenv
