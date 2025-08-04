@@ -2,3 +2,5 @@
 *.log
 *.env
 **/__pycache__/
+Icon
+.DS_Store

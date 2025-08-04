@@ -6,10 +6,10 @@ from routers import post_routes
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    print("--- Post Service: Lifespan event startup ---")
+    print("✳️✳️✳️--- Post Service: Lifespan event startup ---✳️✳️✳️")
     await init_db()
     yield
-    print("--- Post Service: Lifespan event shutdown ---")
+    print("🛑🛑🛑--- Post Service: Lifespan event shutdown ---🛑🛑🛑")
 
 
 app = FastAPI(lifespan=lifespan)

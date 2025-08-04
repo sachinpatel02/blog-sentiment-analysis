@@ -6,7 +6,7 @@ from .routers import user_routes
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    print("--- Lifespan event: Application startup ---")
+    print("✳️✳️✳️--- User Service: Lifespan event startup ---✳️✳️✳️")
     try:
         await init_db()
         yield
@@ -14,7 +14,7 @@ async def lifespan(app: FastAPI):
         print(f"FATAL ERROR: Application startup failed: {e}")
         sys.exit("Could not initialize the database. Exiting application.")
     finally:
-        print("--- Lifespan event: Application shutdown ---")
+        print("🛑🛑🛑--- User Service: Lifespan event shutdown ---🛑🛑🛑")
 
 
 app = FastAPI(lifespan=lifespan)
