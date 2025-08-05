@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware
 from .database import init_db
-from .routers import post_routes
+from .routers import post_routes, comment_routes
 
 
 @asynccontextmanager
@@ -29,3 +29,4 @@ app.add_middleware(
     allow_headers=["*"],
 )
 app.include_router(post_routes.router)
+app.include_router(comment_routes.router)
