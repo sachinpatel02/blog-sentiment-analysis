@@ -25,6 +25,9 @@ class Comment(SQLModel, table=True):
     text: str
     created_at: datetime = Field(default_factory=datetime.utcnow, nullable=False)
     
+    #sentiment
+    sentiment: str | None = Field(default=None, nullable=True)
+    
     #foreign keys
     owner_id: int = Field(foreign_key="user.id")
     post_id: int = Field(foreign_key="post.id")

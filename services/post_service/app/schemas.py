@@ -32,6 +32,9 @@ class CommentPublic(CommentBase):
     created_at: datetime
     owner_id: int
     post_id: int
+    #sentiment
+    sentiment: str | None = None
+
 
 #below is for returning a post with list of comments
 class PostPublicWithComments(PostPublic):

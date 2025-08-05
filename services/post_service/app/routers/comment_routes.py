@@ -3,6 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from .. import crud, schemas, security
 from ..database import get_session
+import httpx
 
 router = APIRouter(
     prefix="/posts/{post_id}/comments",
@@ -22,7 +23,7 @@ async def create_a_comment(
     """
     Create a new comment for a post.
     """
-    # i. chech if post exist
+    # check if post exist
     post = await crud.get_post_by_id(session=session, post_id=post_id)
     if not post:
         raise HTTPException(status_code=404, detail="Post not found")
@@ -33,6 +34,25 @@ async def create_a_comment(
         owner_id=current_user_id,
         post_id=post_id,
     )
+
+    # ♻️🔆☑︎ callint sentiment service
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                "http://127.0.0.1:8002/analyze",
+                json={"text": new_comment.text},
+            )
+            response.raise_for_status()
+            sentiment_data = response.json()
+            sentiment = sentiment_data["sentiment"]
+
+            if sentiment:
+                new_comment.sentiment = sentiment
+                await session.commit()
+                await session.refresh(new_comment)
+    except httpx.RequestError as e:
+        print(f"Could not connect to sentiment service: {e}")
+
     return new_comment
 
 
