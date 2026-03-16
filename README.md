@@ -1,4 +1,4 @@
-# Blog Platform with Sentiment Analysis
+# ✍🏻 Blog Platform with Sentiment Analysis - Microservices & FastAPI
 
 A complete, multi-service backend for a modern blog platform, built from the ground up with **FastAPI**. This project features:
 
